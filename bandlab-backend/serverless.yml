@@ -1,18 +1,56 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: dafba
-# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
-app: bandlab-backend
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: bandlab-backend
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs16.x
+  region: us-east-1
 
 functions:
-  hello:
-    handler: handler.hello
+  createPost:
+    handler: handler.createPost
     events:
-      - httpApi:
-          path: /
-          method: get
+      - http:
+          path: posts
+          method: post
+
+  addComment:
+    handler: handler.addComment
+    events:
+      - http:
+          path: posts/{postId}/comments
+          method: post
+
+resources:
+  Resources:
+    PostEventsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: PostEventsTopic
+
+    PostEventsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: PostEventsQueue
+
+    PostEventsQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: PostEventsQueue
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: AllowSNSToSendMessage
+              Effect: Allow
+              Principal: "*"
+              Action: sqs:SendMessage
+              Resource:
+                Fn::GetAtt:
+                  - PostEventsQueue
+                  - Arn
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: PostEventsTopic
+plugins:
+  - serverless-offline
