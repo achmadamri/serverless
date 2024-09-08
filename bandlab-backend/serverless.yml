@@ -4,15 +4,24 @@ provider:
   name: aws
   runtime: nodejs16.x
   region: us-east-1
+  stage: ${opt:stage, 'dev'}  # Defaults to 'dev' stage if not specified
+
+  environment:
+    SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
+
+custom:
+  snsTopicArn:
+    dev: ${env:SNS_TOPIC_ARN}  # For local development, fetches from .env file
+    prod:
+      Fn::GetAtt:
+        - PostEventsTopic
+        - Arn  # For production, fetches ARN from the actual AWS resource
 
 functions:
   createPost:
     handler: handler.createPost
     environment:
-      SNS_TOPIC_ARN:
-        Fn::GetAtt:
-          - PostEventsTopic
-          - Arn
+      SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
     events:
       - http:
           path: posts
@@ -21,10 +30,7 @@ functions:
   addComment:
     handler: handler.addComment
     environment:
-      SNS_TOPIC_ARN:
-        Fn::GetAtt:
-          - PostEventsTopic
-          - Arn
+      SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
     events:
       - http:
           path: posts/{postId}/comments
@@ -61,7 +67,10 @@ resources:
               Condition:
                 ArnEquals:
                   aws:SourceArn:
-                    Ref: PostEventsTopic
+                    Fn::GetAtt:
+                      - PostEventsTopic
+                      - Arn
 
 plugins:
-  - serverless-offline
+  - serverless-dotenv-plugin  # This will be used for local development only
+  - serverless-offline        # For local development and testing

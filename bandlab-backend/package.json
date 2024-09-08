@@ -16,6 +16,7 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^13.8.0"
   }
 }
