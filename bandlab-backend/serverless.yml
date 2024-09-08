@@ -8,6 +8,11 @@ provider:
 functions:
   createPost:
     handler: handler.createPost
+    environment:
+      SNS_TOPIC_ARN:
+        Fn::GetAtt:
+          - PostEventsTopic
+          - Arn
     events:
       - http:
           path: posts
@@ -15,6 +20,11 @@ functions:
 
   addComment:
     handler: handler.addComment
+    environment:
+      SNS_TOPIC_ARN:
+        Fn::GetAtt:
+          - PostEventsTopic
+          - Arn
     events:
       - http:
           path: posts/{postId}/comments
@@ -52,5 +62,6 @@ resources:
                 ArnEquals:
                   aws:SourceArn:
                     Ref: PostEventsTopic
+
 plugins:
   - serverless-offline
