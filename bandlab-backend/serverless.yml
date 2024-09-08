@@ -1,8 +1,9 @@
 # "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: dafba
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: bandlab-backend
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: bandlab-backend
-frameworkVersion: "4"
 
 provider:
   name: aws
