@@ -100,11 +100,13 @@ AWS SQS
 Create a .env file in the root directory with the following variables:
 
 ```bash
-DYNAMODB_TABLE_POSTS=your-dynamodb-posts-table
-DYNAMODB_TABLE_COMMENTS=your-dynamodb-comments-table
-S3_BUCKET=your-s3-bucket-name
-SNS_TOPIC_ARN=your-sns-topic-arn
-SQS_QUEUE_URL=your-sqs-queue-url
+SNS_TOPIC_ARN=
+SNS_TOPIC_NAME=
+SQS_QUEUE_URL=
+SQS_QUEUE_NAME=
+S3_BUCKET=
+DYNAMODB_TABLE_POSTS=
+DYNAMODB_TABLE_COMMENTS=
 ```
 
 Make sure to replace the placeholders with the actual AWS resource values from your AWS account.
