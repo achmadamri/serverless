@@ -107,6 +107,7 @@ You can test the API endpoints using tools like Postman or curl. Below are the e
 ## Endpoints
 
 1. Create a Post with Image Upload
+
 Method: POST /posts
 
 Body:
