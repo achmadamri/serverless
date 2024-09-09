@@ -157,6 +157,14 @@ module.exports.listPosts = async (event) => {
     };
     const commentResult = await dynamoDB.query(commentParams).promise();
     post.comments = commentResult.Items;
+
+    // Generate a pre-signed URL for the image
+    const imageUrl = s3.getSignedUrl('getObject', {
+      Bucket: S3_BUCKET,
+      Key: `${post.postId}.jpg`,
+      Expires: 3600 // URL valid for 1 hour
+    });
+    post.imageUrl = imageUrl; // Attach the pre-signed URL to the post
   }
 
   return {
