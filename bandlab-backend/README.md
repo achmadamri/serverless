@@ -108,6 +108,7 @@ You can test the API endpoints using tools like Postman or curl. Below are the e
 
 1. Create a Post with Image Upload
 Method: POST /posts
+
 Body:
 ```bash
 {
@@ -118,7 +119,9 @@ Body:
 Description: Upload an image (base64-encoded) and set a caption. The image will be resized and converted to .jpg, then saved to S3.
 
 2. Add a Comment to a Post
+
 Method: POST /posts/{postId}/comments
+
 Body:
 ```bash
 {
@@ -128,11 +131,15 @@ Body:
 Description: Add a comment to a specific post by its postId.
 
 3. Delete a Comment
+
 Method: DELETE /posts/{postId}/comments/{commentId}
+
 Description: Delete a comment by its commentId for the specified postId.
 
 4. List Posts with the Last Two Comments
+
 Method: GET /posts?limit=10&cursor=<optional_cursor>
+
 Description: Retrieve posts, sorted by the number of comments in descending order. Each post will include the last two comments. Supports cursor-based pagination.
 
 ## Project Structure
