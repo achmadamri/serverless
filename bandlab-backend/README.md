@@ -1,69 +1,59 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# BandLab Test Assignment (Backend)
 
-# Serverless Framework Node HTTP API on AWS
+This is the backend implementation for the BandLab test assignment. The goal is to build an image-sharing system that allows users to upload images, add captions, comment on posts, and list posts with the last two comments. The system is designed to be RESTful, scalable, and efficient, leveraging AWS services.
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+## Table of Contents
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+1. [Features](#features)
+2. [Technologies Used](#technologies-used)
+3. [Prerequisites](#prerequisites)
+4. [Getting Started](#getting-started)
+   - [Clone the Repository](#1-clone-the-repository)
+   - [Install Dependencies](#2-install-dependencies)
+   - [Set up Environment Variables](#3-set-up-environment-variables)
+   - [Deploy the Application](#4-deploy-the-application)
+   - [Running Locally](#5-running-locally)
+   - [Testing the Endpoints](#6-testing-the-endpoints)
+5. [Endpoints](#endpoints)
+6. [Project Structure](#project-structure)
+7. [Notes](#notes)
+8. [Future Improvements](#future-improvements)
+9. [License](#license)
 
-## Usage
+## Features
 
-### Deployment
+- Upload images with captions.
+- Convert images to `.jpg` format and resize them to 600x600 pixels.
+- Comment on posts and delete comments.
+- Retrieve posts along with the last two comments.
+- Cursor-based pagination for listing posts.
+- Posts are sorted by the number of comments in descending order.
+- Scalable and serverless architecture using AWS.
 
-In order to deploy the example, you need to run the following command:
+## Technologies Used
 
-```
-serverless deploy
-```
+- **Node.js** for backend logic.
+- **AWS Lambda** for serverless functions.
+- **AWS S3** for storing images.
+- **AWS DynamoDB** for storing posts and comments.
+- **AWS SNS** for sending notifications about new posts.
+- **AWS SQS** for queuing comments for additional processing.
+- **Sharp** for image processing (resizing and converting formats).
+- **Serverless Framework** for managing AWS Lambda and other resources.
 
-After running deploy, you should see output similar to:
+## Prerequisites
 
-```
-Deploying "serverless-http-api" to stage "dev" (us-east-1)
+Make sure you have the following installed on your local machine:
 
-✔ Service deployed to stack serverless-http-api-dev (91s)
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- AWS CLI configured with appropriate permissions
+- Serverless Framework installed globally (`npm install -g serverless`)
 
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: serverless-http-api-dev-hello (1.6 kB)
-```
+## Getting Started
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
+### 1. Clone the Repository
 
-### Invocation
-
-After successful deployment, you can call the created application via HTTP:
-
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
-
-Which should result in response similar to:
-
-```json
-{ "message": "Go Serverless v4! Your function executed successfully!" }
-```
-
-### Local development
-
-The easiest way to develop and test your function is to use the `dev` command:
-
-```
-serverless dev
-```
-
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
-
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name

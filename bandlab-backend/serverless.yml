@@ -9,6 +9,8 @@ provider:
     S3_BUCKET: ${env:S3_BUCKET}
     DYNAMODB_TABLE_POSTS: ${env:DYNAMODB_TABLE_POSTS}
     DYNAMODB_TABLE_COMMENTS: ${env:DYNAMODB_TABLE_COMMENTS}
+    SNS_TOPIC_NAME: ${env:SNS_TOPIC_NAME}
+    SQS_QUEUE_NAME: ${env:SQS_QUEUE_NAME}
 
   iamRoleStatements:
     - Effect: "Allow"
@@ -70,15 +72,27 @@ resources:
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
+          - AttributeName: creator
+            AttributeType: S
+          - AttributeName: comments
+            AttributeType: N
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
         GlobalSecondaryIndexes:
           - IndexName: createdAt-index
             KeySchema:
-              - AttributeName: postId
+              - AttributeName: creator
                 KeyType: HASH
               - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: comments-index
+            KeySchema:
+              - AttributeName: creator
+                KeyType: HASH
+              - AttributeName: comments
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -132,12 +146,12 @@ resources:
     SQSQueue:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: bandlab-backend-queue
+        QueueName: ${self:provider.environment.SQS_QUEUE_NAME}
 
     SNSTopic:
       Type: "AWS::SNS::Topic"
       Properties:
-        TopicName: bandlab-backend-topic
+        TopicName: ${self:provider.environment.SNS_TOPIC_NAME}
 
 plugins:
   - serverless-dotenv-plugin # Load environment variables from .env file
