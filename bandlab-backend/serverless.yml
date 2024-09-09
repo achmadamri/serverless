@@ -10,7 +10,7 @@ provider:
       Action:
         - sns:Publish
       Resource:
-        - arn:aws:sns:us-east-1:104782596134:PostEventsTopic
+        - arn:aws:sns:us-east-1:104782596134:PostEventsTopic-${self:provider.stage}
 
   environment:
     SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
@@ -19,9 +19,7 @@ custom:
   snsTopicArn:
     dev: ${env:SNS_TOPIC_ARN}  # For local development, fetches from .env file
     prod:
-      Fn::GetAtt:
-        - PostEventsTopic
-        - Arn  # For production, fetches ARN from the actual AWS resource
+      Ref: PostEventsTopic
 
 functions:
   createPost:
@@ -47,12 +45,12 @@ resources:
     PostEventsTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: PostEventsTopic
+        TopicName: PostEventsTopic-${self:provider.stage}  # Add stage suffix
 
     PostEventsQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: PostEventsQueue
+        QueueName: PostEventsQueue-${self:provider.stage}  # Add stage suffix
 
     PostEventsQueuePolicy:
       Type: AWS::SQS::QueuePolicy
