@@ -2,77 +2,119 @@ service: bandlab-backend
 
 provider:
   name: aws
-  runtime: nodejs16.x
-  region: us-east-1
-  stage: ${opt:stage, 'dev'}  # Defaults to 'dev' stage if not specified
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - sns:Publish
-      Resource:
-        - arn:aws:sns:us-east-1:104782596134:PostEventsTopic-${self:provider.stage}
-
+  runtime: nodejs18.x
   environment:
-    SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
+    SNS_TOPIC_ARN: ${env:SNS_TOPIC_ARN}
+    SQS_QUEUE_URL: ${env:SQS_QUEUE_URL}
+    S3_BUCKET: ${env:S3_BUCKET}
+    DYNAMODB_TABLE_POSTS: ${env:DYNAMODB_TABLE_POSTS}
+    DYNAMODB_TABLE_COMMENTS: ${env:DYNAMODB_TABLE_COMMENTS}
 
-custom:
-  snsTopicArn:
-    dev: ${env:SNS_TOPIC_ARN}  # For local development, fetches from .env file
-    prod:
-      Ref: PostEventsTopic
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:SendMessage"
+        - "sns:Publish"
+        - "dynamodb:PutItem"
+        - "dynamodb:GetItem"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:Query"
+        - "s3:PutObject"
+        - "s3:GetObject"
+        - "s3:DeleteObject"
+      Resource: "*"
 
 functions:
   createPost:
     handler: handler.createPost
-    environment:
-      SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
     events:
       - http:
           path: posts
           method: post
+          cors: true
 
   addComment:
     handler: handler.addComment
-    environment:
-      SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
     events:
       - http:
           path: posts/{postId}/comments
           method: post
+          cors: true
+
+  deleteComment:
+    handler: handler.deleteComment
+    events:
+      - http:
+          path: posts/{postId}/comments/{commentId}
+          method: delete
+          cors: true
+
+  listPosts:
+    handler: handler.listPosts
+    events:
+      - http:
+          path: posts
+          method: get
+          cors: true
 
 resources:
   Resources:
-    PostEventsTopic:
-      Type: AWS::SNS::Topic
+    PostsDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
       Properties:
-        TopicName: PostEventsTopic-${self:provider.stage}  # Add stage suffix
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_POSTS}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
 
-    PostEventsQueue:
-      Type: AWS::SQS::Queue
+    CommentsDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
       Properties:
-        QueueName: PostEventsQueue-${self:provider.stage}  # Add stage suffix
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_COMMENTS}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+          - AttributeName: commentId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+          - AttributeName: commentId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
 
-    PostEventsQueuePolicy:
-      Type: AWS::SQS::QueuePolicy
+    S3Bucket:
+      Type: "AWS::S3::Bucket"
       Properties:
-        Queues:
-          - Ref: PostEventsQueue
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Sid: AllowSNSToSendMessage
-              Effect: Allow
-              Principal: "*"
-              Action: sqs:SendMessage
-              Resource:
-                Fn::GetAtt:
-                  - PostEventsQueue
-                  - Arn
-              Condition:
-                ArnEquals:
-                  aws:SourceArn:
-                    Ref: PostEventsTopic
+        BucketName: ${self:provider.environment.S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    SQSQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: bandlab-backend-queue
+
+    SNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        TopicName: bandlab-backend-topic
 
 plugins:
-  - serverless-dotenv-plugin  # This will be used for local development only
-  - serverless-offline        # For local development and testing
+  - serverless-dotenv-plugin # Load environment variables from .env file
+  - serverless-offline       # For local testing
