@@ -4,6 +4,12 @@ const sqs = new AWS.SQS();
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 const sharp = require('sharp');
+const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger'); // Import Swagger config
+
+const app = express();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const POSTS_TABLE = process.env.DYNAMODB_TABLE_POSTS;
 const COMMENTS_TABLE = process.env.DYNAMODB_TABLE_COMMENTS;
@@ -12,6 +18,32 @@ const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN;
 const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
 
 // Function to create a new post
+/**
+ * @swagger
+ * /posts:
+ *   post:
+ *     summary: Create a new post
+ *     description: Creates a new post with an image and caption
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: post
+ *         description: The post to create
+ *         schema:
+ *           type: object
+ *           required:
+ *             - caption
+ *             - image
+ *           properties:
+ *             caption:
+ *               type: string
+ *             image:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Post created successfully
+ */
 module.exports.createPost = async (event) => {
   const body = JSON.parse(event.body);
   const caption = body.caption || "Default caption";
@@ -65,6 +97,35 @@ module.exports.createPost = async (event) => {
 };
 
 // Function to add a comment
+/**
+ * @swagger
+ * /posts/{postId}/comments:
+ *   post:
+ *     summary: Add a comment to a post
+ *     description: Adds a new comment to a post
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: ID of the post
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: comment
+ *         description: The comment to add
+ *         schema:
+ *           type: object
+ *           required:
+ *             - content
+ *           properties:
+ *             content:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Comment added successfully
+ */
 module.exports.addComment = async (event) => {
   const body = JSON.parse(event.body);
   const { postId } = event.pathParameters;
@@ -109,6 +170,29 @@ module.exports.addComment = async (event) => {
 };
 
 // Function to delete a comment
+/**
+ * @swagger
+ * /posts/{postId}/comments/{commentId}:
+ *   delete:
+ *     summary: Delete a comment from a post
+ *     description: Deletes a specific comment from a post
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: ID of the post
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         description: ID of the comment
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ */
 module.exports.deleteComment = async (event) => {
   const { postId, commentId } = event.pathParameters;
 
@@ -136,6 +220,16 @@ module.exports.deleteComment = async (event) => {
 };
 
 // Function to list posts with last two comments
+/**
+ * @swagger
+ * /posts:
+ *   get:
+ *     summary: Get a list of posts
+ *     description: Retrieves all posts along with the last two comments for each
+ *     responses:
+ *       200:
+ *         description: List of posts
+ */
 module.exports.listPosts = async (event) => {
   const params = {
     TableName: POSTS_TABLE,
@@ -164,3 +258,5 @@ module.exports.listPosts = async (event) => {
     body: JSON.stringify(posts),
   };
 };
+
+module.exports.app = app;
