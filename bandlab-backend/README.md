@@ -55,8 +55,9 @@ Make sure you have the following installed on your local machine:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/achmadamri/serverless.git
+cd serverless
+cd bandlab-backend
 ```
 
 ### 2. Install Dependencies
