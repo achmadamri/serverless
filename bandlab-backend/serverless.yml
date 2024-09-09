@@ -5,6 +5,12 @@ provider:
   runtime: nodejs16.x
   region: us-east-1
   stage: ${opt:stage, 'dev'}  # Defaults to 'dev' stage if not specified
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource:
+        - arn:aws:sns:us-east-1:104782596134:PostEventsTopic
 
   environment:
     SNS_TOPIC_ARN: ${self:custom.snsTopicArn.${self:provider.stage}}
@@ -67,9 +73,7 @@ resources:
               Condition:
                 ArnEquals:
                   aws:SourceArn:
-                    Fn::GetAtt:
-                      - PostEventsTopic
-                      - Arn
+                    Ref: PostEventsTopic
 
 plugins:
   - serverless-dotenv-plugin  # This will be used for local development only
