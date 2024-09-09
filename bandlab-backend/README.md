@@ -67,7 +67,34 @@ Run the following command to install the required packages:
 npm install
 ```
 
-### 3. Set up Environment Variables
+### 3. AWS Configuration
+
+Before deploying or running the application locally, you need to configure your AWS credentials. You can do this using the aws configure command.
+
+Run the following command in your terminal:
+
+```bash
+aws configure
+```
+
+You will be prompted to enter the following details:
+
+```bash
+AWS Access Key ID [None]: YOUR_ACCESS_KEY_ID
+AWS Secret Access Key [None]: YOUR_SECRET_ACCESS_KEY
+Default region name [None]: YOUR_PREFERRED_REGION (e.g., us-east-1)
+Default output format [None]: json
+```
+
+Make sure you have AWS access and secret keys for an IAM user with the required permissions for the following services:
+
+AWS Lambda
+AWS S3
+AWS DynamoDB
+AWS SNS
+AWS SQS
+
+### 4. Set up Environment Variables
 
 Create a .env file in the root directory with the following variables:
 
@@ -81,7 +108,7 @@ SQS_QUEUE_URL=your-sqs-queue-url
 
 Make sure to replace the placeholders with the actual AWS resource values from your AWS account.
 
-### 4. Deploy the Application
+### 5. Deploy the Application
 To deploy the application to AWS, use the following command:
 
 ```bash
@@ -90,7 +117,7 @@ serverless deploy
 
 This command will deploy your Lambda functions and provision the necessary AWS resources, including DynamoDB tables, S3 bucket, SNS, and SQS.
 
-### 5. Running Locally
+### 6. Running Locally
 
 To run the project locally using the Serverless Framework, you can use the following command:
 
@@ -100,7 +127,7 @@ serverless offline
 
 This will start a local instance of the API, allowing you to test the functions before deploying them to AWS.
 
-### 6. Testing the Endpoints
+### 7. Testing the Endpoints
 
 You can test the API endpoints using tools like Postman or curl. Below are the endpoints with example requests.
 
@@ -147,16 +174,31 @@ Description: Retrieve posts, sorted by the number of comments in descending orde
 
 ```bash
 .
-├── handler.js            # Lambda functions (create post, add comment, delete comment, list posts)
-├── serverless.yml        # Serverless configuration for AWS resources and deployment
-├── package.json          # Project metadata and dependencies
-├── .env                  # Environment variables (excluded from repository)
-└── README.md             # Project documentation
+├── .serverless/                # Serverless deployment files
+├── doc/                        # Documentation folder
+│   ├── bandlab.postman_collection.json  # Postman collection for testing API
+│   └── base64_encoded_image_data        # Sample base64 encoded image
+├── handler.js                  # Lambda functions (create post, add comment, delete comment, list posts)
+├── package.json                # Project metadata and dependencies
+├── package-lock.json           # Dependency lock file
+├── serverless.yml              # Serverless configuration for AWS resources and deployment
+├── .env                        # Environment variables (excluded from repository)
+├── .gitignore                  # Ignored files configuration
+└── README.md                   # Project documentation
 ```
 
 Key Files:
 handler.js: Contains the core logic for creating posts, adding comments, deleting comments, and listing posts.
 serverless.yml: Manages AWS infrastructure provisioning and Lambda function deployments using the Serverless Framework.
+doc/bandlab.postman_collection.json: Postman collection for easier testing of the API endpoints.
+
+Using Postman
+To make it easier to test the API, a Postman collection has been included in the doc folder. Here’s how to use it:
+
+1. Open Postman.
+2. Import the file doc/bandlab.postman_collection.json.
+3. The collection includes all endpoints (create post, add comment, delete comment, list posts), making it simple to test the functionality.
+4. Use the included base64_encoded_image_data file in the doc folder as an example image for upload.
 
 Notes
 The system accepts images in .jpg, .png, and .bmp formats with a maximum size of 100MB.
