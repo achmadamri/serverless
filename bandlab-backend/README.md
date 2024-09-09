@@ -189,7 +189,7 @@ Description: Retrieve posts, sorted by the number of comments in descending orde
 ├── package.json                # Project metadata and dependencies
 ├── package-lock.json           # Dependency lock file
 ├── serverless.yml              # Serverless configuration for AWS resources and deployment
-├── .env                        # Environment variables (excluded from repository)
+├── .env                        # Environment variables
 ├── .gitignore                  # Ignored files configuration
 └── README.md                   # Project documentation
 ```
