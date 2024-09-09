@@ -190,14 +190,19 @@ Description: Retrieve posts, sorted by the number of comments in descending orde
 ├── package-lock.json           # Dependency lock file
 ├── serverless.yml              # Serverless configuration for AWS resources and deployment
 ├── .env                        # Environment variables
+├── env.example                 # Environment variables example
 ├── .gitignore                  # Ignored files configuration
 └── README.md                   # Project documentation
 ```
 
 Key Files:
+
 handler.js: Contains the core logic for creating posts, adding comments, deleting comments, and listing posts.
+
 serverless.yml: Manages AWS infrastructure provisioning and Lambda function deployments using the Serverless Framework.
+
 doc/bandlab.postman_collection.json: Postman collection for easier testing of the API endpoints.
+
 Images in the doc/ folder: Visual representations of API calls for easier reference.
 
 Using Postman
