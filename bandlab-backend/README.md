@@ -57,6 +57,7 @@ Make sure you have the following installed on your local machine:
 ```bash
 git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
+```
 
 ### 2. Install Dependencies
 
@@ -64,6 +65,7 @@ Run the following command to install the required packages:
 
 ```bash
 npm install
+```
 
 ### 3. Set up Environment Variables
 
@@ -75,3 +77,4 @@ DYNAMODB_TABLE_COMMENTS=your-dynamodb-comments-table
 S3_BUCKET=your-s3-bucket-name
 SNS_TOPIC_ARN=your-sns-topic-arn
 SQS_QUEUE_URL=your-sqs-queue-url
+```
