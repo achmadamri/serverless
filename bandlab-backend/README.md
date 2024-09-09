@@ -177,7 +177,11 @@ Description: Retrieve posts, sorted by the number of comments in descending orde
 ├── .serverless/                # Serverless deployment files
 ├── doc/                        # Documentation folder
 │   ├── bandlab.postman_collection.json  # Postman collection for testing API
-│   └── base64_encoded_image_data        # Sample base64 encoded image
+│   ├── base64_encoded_image_data        # Sample base64 encoded image
+│   ├── img_add_posts.png                # Image for creating a post
+│   ├── img_add_comments.png             # Image for adding comments
+│   ├── img_delete_comments.png          # Image for deleting comments
+│   └── img_list_posts.png               # Image for listing posts
 ├── handler.js                  # Lambda functions (create post, add comment, delete comment, list posts)
 ├── package.json                # Project metadata and dependencies
 ├── package-lock.json           # Dependency lock file
@@ -191,6 +195,7 @@ Key Files:
 handler.js: Contains the core logic for creating posts, adding comments, deleting comments, and listing posts.
 serverless.yml: Manages AWS infrastructure provisioning and Lambda function deployments using the Serverless Framework.
 doc/bandlab.postman_collection.json: Postman collection for easier testing of the API endpoints.
+Images in the doc/ folder: Visual representations of API calls for easier reference.
 
 Using Postman
 To make it easier to test the API, a Postman collection has been included in the doc folder. Here’s how to use it:
