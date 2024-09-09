@@ -195,7 +195,7 @@ Description: Retrieve posts, sorted by the number of comments in descending orde
 └── README.md                   # Project documentation
 ```
 
-# Key Files:
+## Key Files:
 
 handler.js: Contains the core logic for creating posts, adding comments, deleting comments, and listing posts.
 
@@ -205,7 +205,7 @@ doc/bandlab.postman_collection.json: Postman collection for easier testing of th
 
 Images in the doc/ folder: Visual representations of API calls for easier reference.
 
-# Using Postman
+## Using Postman
 
 To make it easier to test the API, a Postman collection has been included in the doc folder. Here’s how to use it:
 
@@ -214,7 +214,7 @@ To make it easier to test the API, a Postman collection has been included in the
 3. The collection includes all endpoints (create post, add comment, delete comment, list posts), making it simple to test the functionality.
 4. Use the included base64_encoded_image_data file in the doc folder as an example image for upload.
 
-# Notes
+## Notes
 
 The system accepts images in .jpg, .png, and .bmp formats with a maximum size of 100MB.
 
@@ -224,7 +224,7 @@ Pre-signed URLs are used for securely retrieving images from S3.
 
 The system leverages AWS services for scalability and serverless computing, ensuring it can handle high traffic efficiently.
 
-# Future Improvements
+## Future Improvements
 
 Error Handling: Implement more robust error handling for edge cases, including invalid image formats or sizes.
 
