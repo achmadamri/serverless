@@ -137,13 +137,26 @@ module.exports.deleteComment = async (event) => {
 
 // Function to list posts with last two comments
 module.exports.listPosts = async (event) => {
+  const { limit, cursor } = event.queryStringParameters || {};
+
   const params = {
     TableName: POSTS_TABLE,
-    Limit: 10, // Implement pagination using this limit and a cursor
-    ScanIndexForward: false, // Sort by comments in descending order
+    IndexName: 'comments-index', // Use the GSI on createdAt
+    KeyConditionExpression: "creator = :creator", // Use postId as partition key
+    ExpressionAttributeValues: {
+      ":creator": "User" // Replace with the actual postId value
+    },
+    Limit: limit ? parseInt(limit) : 10,
+    ScanIndexForward: false, // Sort by createdAt in descending order
   };
 
-  const result = await dynamoDB.scan(params).promise();
+  // If a cursor is provided, decode it
+  if (cursor) {
+    params.ExclusiveStartKey = JSON.parse(Buffer.from(cursor, 'base64').toString('ascii'));
+  }
+
+  // Query DynamoDB
+  const result = await dynamoDB.query(params).promise();
   const posts = result.Items;
 
   // Retrieve last two comments for each post
@@ -157,10 +170,26 @@ module.exports.listPosts = async (event) => {
     };
     const commentResult = await dynamoDB.query(commentParams).promise();
     post.comments = commentResult.Items;
+
+    // Generate a pre-signed URL for the image
+    const imageUrl = s3.getSignedUrl('getObject', {
+      Bucket: S3_BUCKET,
+      Key: `${post.postId}.jpg`,
+      Expires: 3600 // URL valid for 1 hour
+    });
+    post.imageUrl = imageUrl; // Attach the pre-signed URL to the post
   }
+
+  // Handle pagination
+  const nextCursor = result.LastEvaluatedKey
+    ? Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
+    : null;
 
   return {
     statusCode: 200,
-    body: JSON.stringify(posts),
+    body: JSON.stringify({
+      posts,
+      nextCursor,
+    }),
   };
 };

@@ -9,12 +9,16 @@ provider:
     S3_BUCKET: ${env:S3_BUCKET}
     DYNAMODB_TABLE_POSTS: ${env:DYNAMODB_TABLE_POSTS}
     DYNAMODB_TABLE_COMMENTS: ${env:DYNAMODB_TABLE_COMMENTS}
+    SNS_TOPIC_NAME: ${env:SNS_TOPIC_NAME}
+    SQS_QUEUE_NAME: ${env:SQS_QUEUE_NAME}
 
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "sqs:SendMessage"
         - "sns:Publish"
+        - "dynamodb:Scan"
+        - "dynamodb:Query"
         - "dynamodb:PutItem"
         - "dynamodb:GetItem"
         - "dynamodb:UpdateItem"
@@ -66,9 +70,32 @@ resources:
         AttributeDefinitions:
           - AttributeName: postId
             AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: creator
+            AttributeType: S
+          - AttributeName: comments
+            AttributeType: N
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: createdAt-index
+            KeySchema:
+              - AttributeName: creator
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: comments-index
+            KeySchema:
+              - AttributeName: creator
+                KeyType: HASH
+              - AttributeName: comments
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
 
     CommentsDynamoDBTable:
@@ -80,11 +107,22 @@ resources:
             AttributeType: S
           - AttributeName: commentId
             AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
           - AttributeName: commentId
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: createdAt-index
+            KeySchema:
+              - AttributeName: postId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
 
     S3Bucket:
@@ -108,12 +146,12 @@ resources:
     SQSQueue:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: bandlab-backend-queue
+        QueueName: ${self:provider.environment.SQS_QUEUE_NAME}
 
     SNSTopic:
       Type: "AWS::SNS::Topic"
       Properties:
-        TopicName: bandlab-backend-topic
+        TopicName: ${self:provider.environment.SNS_TOPIC_NAME}
 
 plugins:
   - serverless-dotenv-plugin # Load environment variables from .env file
