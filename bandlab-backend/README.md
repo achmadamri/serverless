@@ -78,3 +78,92 @@ S3_BUCKET=your-s3-bucket-name
 SNS_TOPIC_ARN=your-sns-topic-arn
 SQS_QUEUE_URL=your-sqs-queue-url
 ```
+
+Make sure to replace the placeholders with the actual AWS resource values from your AWS account.
+
+### 4. Deploy the Application
+To deploy the application to AWS, use the following command:
+
+```bash
+serverless deploy
+```
+
+This command will deploy your Lambda functions and provision the necessary AWS resources, including DynamoDB tables, S3 bucket, SNS, and SQS.
+
+### 5. Running Locally
+
+To run the project locally using the Serverless Framework, you can use the following command:
+
+```bash
+serverless offline
+```
+
+This will start a local instance of the API, allowing you to test the functions before deploying them to AWS.
+
+### 6. Testing the Endpoints
+
+You can test the API endpoints using tools like Postman or curl. Below are the endpoints with example requests.
+
+## Endpoints
+
+Create a Post with Image Upload
+Method: POST /posts
+Body:
+```bash
+{
+  "caption": "My first post",
+  "image": "<base64_encoded_image_data>"
+}
+```
+Description: Upload an image (base64-encoded) and set a caption. The image will be resized and converted to .jpg, then saved to S3.
+
+Add a Comment to a Post
+Method: POST /posts/{postId}/comments
+Body:
+```bash
+{
+  "content": "Nice picture!"
+}
+```
+Description: Add a comment to a specific post by its postId.
+
+Delete a Comment
+Method: DELETE /posts/{postId}/comments/{commentId}
+Description: Delete a comment by its commentId for the specified postId.
+
+List Posts with the Last Two Comments
+Method: GET /posts?limit=10&cursor=<optional_cursor>
+Description: Retrieve posts, sorted by the number of comments in descending order. Each post will include the last two comments. Supports cursor-based pagination.
+
+## Project Structure
+
+```bash
+.
+├── handler.js            # Lambda functions (create post, add comment, delete comment, list posts)
+├── serverless.yml        # Serverless configuration for AWS resources and deployment
+├── package.json          # Project metadata and dependencies
+├── .env                  # Environment variables (excluded from repository)
+└── README.md             # Project documentation
+```
+
+Key Files:
+handler.js: Contains the core logic for creating posts, adding comments, deleting comments, and listing posts.
+serverless.yml: Manages AWS infrastructure provisioning and Lambda function deployments using the Serverless Framework.
+
+Notes
+The system accepts images in .jpg, .png, and .bmp formats with a maximum size of 100MB.
+Images are automatically resized to 600x600 pixels and converted to .jpg format.
+Pre-signed URLs are used for securely retrieving images from S3.
+The system leverages AWS services for scalability and serverless computing, ensuring it can handle high traffic efficiently.
+
+Future Improvements
+Error Handling: Implement more robust error handling for edge cases, including invalid image formats or sizes.
+Performance Monitoring: Add performance monitoring tools to track API response times and throughput, ensuring non-functional requirements are met.
+Authentication: Introduce user authentication and authorization to secure the API and associate posts and comments with authenticated users.
+Logging: Improve logging and tracing for debugging and monitoring the system in production.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+This full `README.md` provides comprehensive details for cloning, setting up, deploying, and running your project. It also covers all the endpoints and project structure, ensuring the reader has a complete understanding of the project.
