@@ -141,13 +141,13 @@ module.exports.listPosts = async (event) => {
 
   const params = {
     TableName: POSTS_TABLE,
-    IndexName: 'comments-index', // Use the GSI on createdAt
-    KeyConditionExpression: "creator = :creator", // Use postId as partition key
+    IndexName: 'comments-index', // Use the GSI on comments
+    KeyConditionExpression: "creator = :creator", // Use creator as partition key
     ExpressionAttributeValues: {
       ":creator": "User" // Replace with the actual postId value
     },
     Limit: limit ? parseInt(limit) : 10,
-    ScanIndexForward: false, // Sort by createdAt in descending order
+    ScanIndexForward: false, // Sort by comments in descending order
   };
 
   // If a cursor is provided, decode it
