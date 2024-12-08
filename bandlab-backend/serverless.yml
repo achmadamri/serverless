@@ -61,6 +61,14 @@ functions:
           method: get
           cors: true
 
+  swagger:
+    handler: handler.app
+    events:
+      - http:
+          path: api-docs
+          method: get
+          cors: true
+
 resources:
   Resources:
     PostsDynamoDBTable:
@@ -154,5 +162,5 @@ resources:
         TopicName: ${self:provider.environment.SNS_TOPIC_NAME}
 
 plugins:
-  - serverless-dotenv-plugin # Load environment variables from .env file
-  - serverless-offline       # For local testing
+  - serverless-dotenv-plugin
+  - serverless-offline
